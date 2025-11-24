@@ -212,7 +212,7 @@
         </div>
     </section>
 
-    <footer class="bg-slate-950 text-slate-400 py-12 border-t border-slate-900 text-sm"><div class="max-w-7xl mx-auto px-4 text-center"><p class="text-slate-500">© 2025 Coottyvision Inc.</p></div></footer>
+    <footer class="bg-slate-950 text-slate-400 py-12 border-t border-slate-900 text-sm"><div class="max-w-7xl mx-auto px-4 text-center"><p class="text-slate-500">Coottyvision - Web por Marco Montoro</p></div></footer>
 
     <!-- MODALS -->
     <div id="cart-modal" class="fixed inset-0 z-50 hidden">
@@ -231,8 +231,8 @@
             <div class="p-8">
                 <div class="text-center mb-8">
                     <p class="text-sm text-slate-500 mb-3 font-medium">Escanea el QR o copia el número</p>
-                    <div class="bg-gray-50 p-4 rounded-2xl inline-block mb-4 border border-gray-200"><img src="https://upload.wikimedia.org/wikipedia/commons/d/d0/QR_code_for_mobile_English_Wikipedia.svg" class="w-40 h-40 object-contain opacity-60 mix-blend-multiply mx-auto"></div>
-                    <div class="flex justify-center"><button onclick="copyNumber('999999999')" class="flex items-center gap-3 px-5 py-3 bg-slate-50 hover:bg-slate-100 rounded-full border border-slate-200 transition-all group active:scale-95"><div class="flex gap-1 font-bold text-lg"><span class="yape-text">Yape</span> <span class="text-gray-300">|</span> <span class="plin-text">Plin</span></div><span class="text-slate-800 font-mono text-lg ml-1">999 999 999</span><div class="bg-white p-1.5 rounded-full shadow-sm border border-slate-100 group-hover:text-teal-600"><i data-lucide="copy" class="w-4 h-4"></i></div></button></div>
+                    <div class="bg-gray-50 p-4 rounded-2xl inline-block mb-4 border border-gray-200"><img src="cfc6f172-306d-48d7-a0bb-1861e116f771.jpg" class="w-40 h-40 object-contain opacity-60 mix-blend-multiply mx-auto"></div>
+                    <div class="flex justify-center"><button onclick="copyNumber('974559091')" class="flex items-center gap-3 px-5 py-3 bg-slate-50 hover:bg-slate-100 rounded-full border border-slate-200 transition-all group active:scale-95"><div class="flex gap-1 font-bold text-lg"><span class="yape-text">Yape</span> <span class="text-gray-300">|</span> <span class="plin-text">Plin</span></div><span class="text-slate-800 font-mono text-lg ml-1">974 559 091</span><div class="bg-white p-1.5 rounded-full shadow-sm border border-slate-100 group-hover:text-teal-600"><i data-lucide="copy" class="w-4 h-4"></i></div></button></div>
                 </div>
                 <form onsubmit="event.preventDefault(); processPayment();" class="space-y-4 border-t border-slate-100 pt-6">
                     <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1 ml-1">Tu nombre</label><input type="text" id="pay-name" placeholder="¿Quién realiza el pago?" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-teal-500 transition-all font-bold text-slate-800" required></div>
@@ -329,7 +329,7 @@
             const oi = `OI: ${document.getElementById('q-oi-sph').value || '0.00'} / ${document.getElementById('q-oi-cyl').value || '0.00'} x ${document.getElementById('q-oi-ax').value || '0°'}`;
             if(!name) return alert("Ingresa tu nombre");
             try { await addDoc(collection(db, 'quotes'), { name, type, notes, prescription: { od, oi }, date: new Date().toISOString(), status: 'new' }); } catch(e) {}
-            const phone = "51999999999"; 
+            const phone = "51974559091"; 
             const text = `Hola Coottyvision, soy ${name}. Solicito cotización para: ${type}. \n\nReceta:\n${od}\n${oi}\n\nNotas: ${notes}`;
             window.open(`https://wa.me/${phone}?text=${encodeURIComponent(text)}`, '_blank');
         };
@@ -358,7 +358,7 @@
                 const orderId = '#' + Math.random().toString(36).substr(2, 6).toUpperCase();
                 await addDoc(collection(db, 'orders'), { orderId: orderId, items: cart, total: total, status: 'pending', date: new Date().toISOString(), customer: clientName, paymentMethod: 'Yape/Plin' });
                 await Promise.all(cart.map(item => updateDoc(doc(db, 'products', item.id), { stock: increment(-1) })));
-                const phone = "51999999999"; const text = `Hola Coottyvision, soy ${clientName}. Pedido ${orderId}. Total $${total.toFixed(2)}. Adjunto pago.`;
+                const phone = "51974559091"; const text = `Hola Coottyvision, soy ${clientName}. Pedido ${orderId}. Total $${total.toFixed(2)}. Adjunto pago.`;
                 window.open(`https://wa.me/${phone}?text=${encodeURIComponent(text)}`, '_blank');
                 cart = []; updateCart(); renderStore(); 
                 btn.innerHTML = `<i data-lucide="check-circle" class="w-6 h-6"></i> ¡Enviado! Revisa WhatsApp`; btn.classList.remove('btn-whatsapp'); btn.classList.add('btn-success');
@@ -379,7 +379,7 @@
         }
 
         window.copyNumber = (number) => { navigator.clipboard.writeText(number).then(() => showToast("Copiado!")).catch(() => showToast("Copiado!")); };
-        window.sendToWhatsapp = () => { const n = document.getElementById('w-name').value; const m = document.getElementById('w-message').value; if(!n||!m) return alert("Faltan datos"); const p = "51999999999"; window.open(`https://wa.me/${p}?text=${encodeURIComponent(`Hola, soy ${n}. ${m}`)}`, '_blank'); };
+        window.sendToWhatsapp = () => { const n = document.getElementById('w-name').value; const m = document.getElementById('w-message').value; if(!n||!m) return alert("Faltan datos"); const p = "51974559091"; window.open(`https://wa.me/${p}?text=${encodeURIComponent(`Hola, soy ${n}. ${m}`)}`, '_blank'); };
         function showToast(message) { const c = document.getElementById('toast-container'); const t = document.createElement('div'); t.className = 'bg-slate-900 text-white px-6 py-3 rounded-full shadow-2xl flex items-center gap-3 text-sm font-bold toast-enter transition-all duration-300 pointer-events-auto min-w-[200px] justify-center mb-4'; t.innerHTML = `<i data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i> ${message}`; c.appendChild(t); lucide.createIcons(); requestAnimationFrame(() => { t.classList.remove('toast-enter'); t.classList.add('toast-enter-active'); }); setTimeout(() => { t.classList.remove('toast-enter-active'); t.classList.add('toast-exit-active'); setTimeout(() => t.remove(), 300); }, 3000); }
         lucide.createIcons();
     </script>
