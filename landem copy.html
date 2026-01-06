@@ -383,6 +383,34 @@
     
     <div id="toast-container" class="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 flex flex-col gap-3 pointer-events-none"></div>
 
+<div id="success-modal" class="fixed inset-0 z-[80] hidden flex items-center justify-center px-4">
+    <div class="absolute inset-0 bg-slate-900/90 backdrop-blur-sm transition-opacity"></div>
+    
+    <div class="bg-white rounded-3xl p-8 md:p-10 max-w-md w-full relative z-10 text-center animate-fade-in-up shadow-2xl border-4 border-amber-100">
+        <div class="w-24 h-24 bg-amber-50 text-amber-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner relative">
+            <div class="absolute inset-0 rounded-full border-4 border-amber-100 animate-ping opacity-75"></div>
+            <i data-lucide="clock" class="w-12 h-12"></i>
+        </div>
+        
+        <h3 class="text-3xl font-black text-slate-900 mb-4 leading-none uppercase tracking-tight">
+            PEDIDO POR CONFIRMAR
+        </h3>
+        
+        <p class="text-slate-600 text-lg mb-8 font-bold leading-relaxed px-2">
+            TE ENVIAREMOS UN MENSAJE AL NÚMERO BRINDADO PARA VALIDAR TU PAGO Y COORDINAR LA ENTREGA.
+        </p>
+        
+        <div class="bg-slate-50 rounded-xl p-4 mb-8 border border-slate-100">
+            <p class="text-xs text-slate-400 uppercase font-bold mb-1">Tu ID de Pedido es:</p>
+            <p id="success-order-id" class="text-2xl font-mono font-bold text-cyan-700 tracking-wider">#------</p>
+        </div>
+
+        <button onclick="closeSuccessModal()" class="w-full bg-slate-900 text-white py-4 rounded-xl font-bold shadow-lg text-lg hover:scale-105 transition-transform">
+            Entendido, Gracias
+        </button>
+    </div>
+</div>
+    
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
@@ -720,21 +748,33 @@ function updateCartUI() {
             const itemsList = cart.map(i => `• ${i.name}`).join('\n');
             const waText = `*NUEVO PEDIDO PAGADO ${orderId}* ✅\n\n🏦 *Método:* ${currentPaymentMethod}\n🔢 *Operación:* ${opCode}\n\n👤 *Cliente:* ${name}\n📍 *Destino:* ${city}, ${district}\n🏠 *Dirección:* ${address}\n\n🛒 *Productos:*\n${itemsList}\n\n💰 *Total Pagado: S/${total.toFixed(2)}*`;
             
-            window.open(`https://wa.me/51974559091?text=${encodeURIComponent(waText)}`, '_blank');
+window.open(`https://wa.me/51974559091?text=${encodeURIComponent(waText)}`, '_blank');
             
-            // Limpieza local
+            // 1. Limpieza
             cart = []; 
             updateCartUI(); 
             localStorage.removeItem('cv_cart'); 
-            window.togglePaymentModal();
-            showToast("¡Pago registrado! Te contactaremos pronto.");
             
+            // 2. Cerrar modal de pago
+            window.togglePaymentModal();
+
+            // 3. MOSTRAR EL MENSAJE GRANDE (NUEVO)
+            document.getElementById('success-order-id').innerText = orderId; // Ponemos el ID en el mensaje
+            document.getElementById('success-modal').classList.remove('hidden');
+            lucide.createIcons(); // Para que se vea el icono del reloj
+
         } catch(e) { 
             alert("⚠️ Error: " + e); 
         } finally {
             btn.innerHTML = originalText; 
             btn.disabled = false;
         }
+    };
+
+    // Agregar función para cerrar el mensaje grande
+    window.closeSuccessModal = () => {
+        document.getElementById('success-modal').classList.add('hidden');
+        window.scrollTo(0,0); // Subir al inicio de la página
     };
     
     // --- FUNCIONES RESTAURADAS (Cotización, Rastreo, Utils) ---
@@ -813,6 +853,7 @@ window.toggleMobileMenu = () => {
 </body>
 
 </html>
+
 
 
 
