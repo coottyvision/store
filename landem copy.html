@@ -374,18 +374,33 @@
     window.loginGoogle = async () => { try { await signInWithPopup(auth, provider); } catch(e) { console.error(e); } };
     window.logout = () => signOut(auth);
 
-    onAuthStateChanged(auth, async (user) => {
+onAuthStateChanged(auth, async (user) => {
         currentUser = user;
+        
+        // Elementos Desktop
         const btnLogin = document.getElementById('btn-login');
         const userMenu = document.getElementById('user-menu');
         
+        // Elementos Móvil
+        const btnLoginMobile = document.getElementById('btn-login-mobile');
+        const userMenuMobile = document.getElementById('user-menu-mobile');
+
         if(user) {
+            // Mostrar Usuario y Ocultar Login (Desktop)
             btnLogin.classList.add('hidden');
             userMenu.classList.remove('hidden'); userMenu.classList.add('flex');
             document.getElementById('user-name').innerText = user.displayName.split(' ')[0];
             document.getElementById('user-photo').src = user.photoURL;
+
+            // Mostrar Usuario y Ocultar Login (Móvil)
+            if(btnLoginMobile) btnLoginMobile.classList.add('hidden');
+            if(userMenuMobile) {
+                userMenuMobile.classList.remove('hidden'); userMenuMobile.classList.add('flex');
+                document.getElementById('user-name-mobile').innerText = user.displayName;
+                document.getElementById('user-photo-mobile').src = user.photoURL;
+            }
             
-            // Cargar datos de envío previos si existen
+            // Cargar datos de envío... (resto del código igual)
             const userDoc = await getDoc(doc(db, 'users', user.uid));
             if(userDoc.exists()) {
                 const d = userDoc.data();
@@ -398,19 +413,22 @@
                 }
             }
         } else {
+            // Mostrar Login y Ocultar Usuario
             btnLogin.classList.remove('hidden');
             userMenu.classList.add('hidden'); userMenu.classList.remove('flex');
+            
+            if(btnLoginMobile) btnLoginMobile.classList.remove('hidden');
+            if(userMenuMobile) { userMenuMobile.classList.add('hidden'); userMenuMobile.classList.remove('flex'); }
         }
         
-        // Cargar Productos
+        // Cargar Productos... (resto del código igual)
         onSnapshot(collection(db, 'products'), snap => { 
             allProducts = snap.docs.map(d => ({id: d.id, ...d.data()})); 
             renderStore();
-            // Actualizar UI del carrito al cargar productos (por si cambió precio/foto)
             if(savedCart) updateCartUI(); 
         });
     });
-
+    
     // --- LÓGICA DE TIENDA ---
     window.filterProducts = (c) => { currentFilter = c; document.querySelectorAll('.filter-btn').forEach(b => { b.classList.remove('bg-slate-900', 'text-white', 'shadow-lg'); b.classList.add('bg-white', 'text-slate-600', 'border-slate-200'); }); event.target.classList.remove('bg-white', 'text-slate-600', 'border-slate-200'); event.target.classList.add('bg-slate-900', 'text-white', 'shadow-lg'); renderStore(); };
 
@@ -583,10 +601,17 @@
     window.showToast = (m) => { const c = document.getElementById('toast-container'); const t = document.createElement('div'); t.className = 'bg-slate-900 text-white px-6 py-3 rounded-full shadow-2xl flex items-center gap-3 text-sm font-bold toast-enter transition-all duration-300 pointer-events-auto min-w-[200px] justify-center mb-4'; t.innerHTML = `<i data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i> ${m}`; c.appendChild(t); lucide.createIcons(); requestAnimationFrame(() => { t.classList.remove('toast-enter'); t.classList.add('toast-enter-active'); }); setTimeout(() => { t.classList.remove('toast-enter-active'); t.classList.add('toast-exit-active'); setTimeout(() => t.remove(), 300); }, 3000); };
     window.copyNumber = (n) => { navigator.clipboard.writeText(n).then(() => showToast("Copiado!")).catch(() => showToast("Copiado!")); };
 
+window.toggleMobileMenu = () => {
+        const menu = document.getElementById('mobile-menu-container');
+        menu.classList.toggle('hidden');
+        menu.classList.toggle('flex');
+    };
+    
     lucide.createIcons();
 </script>
 
 </body>
 
 </html>
+
 
