@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coottyvision | Colección Verano 2026</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;800&display=swap" rel="stylesheet">
+    <style>
+        html { scroll-behavior: smooth; scroll-padding-top: 100px; }
+        body { font-family: 'Outfit', sans-serif; }
+        
+        /* Estilos Base y Gradientes de Verano */
+        .glass-nav { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(12px); border-bottom: 1px solid #cffafe; }
+        .summer-gradient { background: linear-gradient(180deg, #ecfeff 0%, #ffffff 100%); }
+        
+        /* Botones Personalizados */
+        .btn-primary { background: linear-gradient(135deg, #0891b2 0%, #155e75 100%); transition: all 0.3s ease; }
+        .btn-primary:hover { filter: brightness(110%); box-shadow: 0 10px 25px -5px rgba(8, 145, 178, 0.4); transform: translateY(-1px); }
+        
+        .btn-quote { background: linear-gradient(135deg, #d97706 0%, #b45309 100%); transition: all 0.3s ease; }
+        .btn-quote:hover { filter: brightness(110%); transform: translateY(-1px); box-shadow: 0 10px 20px -5px rgba(217, 119, 6, 0.3); }
+        
+        .btn-whatsapp { background: #25D366; }
+        .btn-whatsapp:hover { background: #1da851; box-shadow: 0 10px 25px -5px rgba(37, 211, 102, 0.4); transform: translateY(-1px); }
+        .btn-success { background: #1e293b; cursor: default; }
+        
+        /* Tarjetas y Utilidades */
+        .product-card { transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+        .product-card:hover { transform: translateY(-8px); box-shadow: 0 20px 40px -10px rgba(8, 145, 178, 0.15); }
+        
+        .hide-scroll::-webkit-scrollbar { display: none; }
+        .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
+        .sold-out { opacity: 0.7; filter: grayscale(0.9); pointer-events: none; }
+        
+        /* Animaciones */
+        .toast-enter { transform: translateY(100%); opacity: 0; }
+        .toast-enter-active { transform: translateY(0); opacity: 1; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+        .toast-exit { transform: translateY(0); opacity: 1; }
+        .toast-exit-active { transform: translateY(100%); opacity: 0; transition: all 0.4s; }
+        
+        .timeline-step { @apply relative z-10 flex items-center justify-center w-8 h-8 rounded-full bg-gray-200 text-gray-500 font-bold text-xs transition-all duration-500; }
+        .timeline-step.active { @apply bg-cyan-600 text-white scale-110 shadow-lg shadow-cyan-200; }
+        .timeline-line-fill { @apply absolute top-1/2 left-0 h-1 bg-cyan-500 -z-0 transition-all duration-1000; }
+
+        /* Animación de fondo (Blobs) */
+        @keyframes blob { 0% { transform: translate(0px, 0px) scale(1); } 33% { transform: translate(30px, -50px) scale(1.1); } 66% { transform: translate(-20px, 20px) scale(0.9); } 100% { transform: translate(0px, 0px) scale(1); } }
+        .animate-blob { animation: blob 7s infinite; }
+        .animation-delay-2000 { animation-delay: 2s; }
+    </style>
+</head>
+<body class="bg-white text-slate-900 selection:bg-cyan-100 selection:text-cyan-900">
+
+    <nav class="fixed top-0 w-full glass-nav z-50 transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 h-20 flex justify-between items-center">
+            <div class="flex items-center gap-3 cursor-pointer group" onclick="window.scrollTo(0,0)">
+                <div class="bg-cyan-700 text-white p-2 rounded-xl font-bold tracking-tighter shadow-lg group-hover:rotate-3 transition-transform">CV</div>
+                <div>
+                    <span class="font-bold text-xl tracking-tight leading-none block text-slate-900">Coottyvision</span>
+                    <span class="text-[10px] font-bold text-cyan-600 uppercase tracking-widest leading-none block flex items-center gap-1">Verano 2026 <i data-lucide="sun" class="w-3 h-3 text-amber-500"></i></span>
+                </div>
+            </div>
+<div class="hidden md:flex items-center gap-4 text-sm font-medium text-slate-600">
+    <a href="#catalog" class="hover:text-cyan-600 transition-colors">Colección</a>
+    <a href="#quote" class="hover:text-amber-600 transition-colors">Cotizar</a>
+    <a href="#contact" class="hover:text-cyan-600 transition-colors">Ayuda</a>
+    <button onclick="toggleTrackModal()" class="hover:text-cyan-600 transition-colors flex items-center gap-1 text-xs font-bold"><i data-lucide="package-search" class="w-4 h-4"></i> Rastrear</button>
+
+    <div id="user-menu" class="hidden items-center gap-2 border-l border-slate-200 pl-4">
+        <img id="user-photo" src="" class="w-8 h-8 rounded-full border border-slate-200">
+        <div class="flex flex-col">
+            <span id="user-name" class="font-bold text-slate-800 text-xs leading-none">Usuario</span>
+            <button onclick="logout()" class="text-[10px] text-red-500 hover:underline text-left leading-none mt-1">Salir</button>
+        </div>
+    </div>
+
+    <button id="btn-login" onclick="loginGoogle()" class="flex items-center gap-2 bg-slate-900 text-white px-4 py-2 rounded-full text-xs font-bold hover:bg-slate-800 transition-all shadow-lg ml-2">
+        <i data-lucide="user" class="w-3 h-3"></i> Ingresar
+    </button>
+
+    <button onclick="toggleCart()" class="relative p-3 bg-cyan-50 hover:bg-cyan-100 rounded-full transition-colors group ml-2">
+        <i data-lucide="shopping-bag" class="w-5 h-5 text-cyan-700"></i>
+        <span id="cart-count" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full hidden shadow-sm border-2 border-white">0</span>
+    </button>
+</div>        
+
+            <div class="md:hidden flex items-center gap-4">
+                <button onclick="toggleTrackModal()" class="text-slate-600"><i data-lucide="package-search" class="w-6 h-6"></i></button>
+                <button onclick="toggleCart()" class="relative p-2">
+                    <i data-lucide="shopping-bag" class="w-6 h-6 text-slate-800"></i>
+                    <span id="cart-count-mobile" class="absolute top-0 right-0 bg-red-500 text-white text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full hidden">0</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <header class="relative pt-32 pb-16 lg:pt-56 lg:pb-40 px-4 overflow-hidden summer-gradient">
+        <div class="absolute inset-0 z-0 opacity-40 pointer-events-none">
+            <div class="absolute top-0 right-0 w-96 h-96 bg-amber-200 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob"></div>
+            <div class="absolute bottom-0 left-0 w-96 h-96 bg-cyan-200 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob animation-delay-2000"></div>
+            <div class="absolute inset-0 bg-white/30 backdrop-blur-[1px]"></div>
+        </div>
+        
+        <div class="max-w-5xl mx-auto text-center relative z-10">
+            <div class="inline-flex items-center gap-2 py-1.5 px-4 rounded-full bg-white/90 backdrop-blur border border-cyan-100 shadow-sm mb-8 animate-fade-in-up">
+                <span class="relative flex h-2 w-2">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
+                </span>
+                <span class="text-xs font-bold text-cyan-900 uppercase tracking-wider">Nueva Temporada 2026</span>
+            </div>
+            <h1 class="text-5xl md:text-8xl font-extrabold text-slate-900 mb-6 tracking-tight leading-tight drop-shadow-sm">
+                Tu mirada, <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-600 to-amber-500">tu verano.</span>
+            </h1>
+            <p class="text-lg md:text-2xl text-slate-700 max-w-2xl mx-auto mb-12 leading-relaxed font-medium">
+                Protege tus ojos con estilo. Tecnología UV400 y diseños exclusivos para disfrutar el sol sin preocupaciones.
+            </p>
+            <div class="flex justify-center gap-4 flex-col sm:flex-row">
+                <a href="#catalog" class="btn-primary text-white px-10 py-4 rounded-full font-bold text-lg inline-flex items-center justify-center gap-2 shadow-2xl shadow-cyan-900/20 transform hover:scale-105 transition-all">
+                    Ver Catálogo <i data-lucide="sun" class="w-5 h-5"></i>
+                </a>
+                <a href="#quote" class="btn-quote text-white px-10 py-4 rounded-full font-bold text-lg inline-flex items-center justify-center gap-2 shadow-2xl shadow-amber-900/20 transform hover:scale-105 transition-all">
+                    Cotizar Medida <i data-lucide="calculator" class="w-5 h-5"></i>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <section id="catalog" class="py-20 bg-white scroll-mt-24">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6">
+            <div class="flex flex-col items-center mb-10 gap-4">
+                <h2 class="text-3xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
+                    <i data-lucide="sparkles" class="w-8 h-8 text-amber-500"></i> Catálogo 2026
+                </h2>
+                <p class="text-slate-500">Encuentra tu estilo perfecto.</p>
+                
+                <div class="flex flex-wrap justify-center gap-3 mt-4">
+                    <button onclick="filterProducts('all')" class="filter-btn active px-6 py-2.5 rounded-full text-sm font-semibold border transition-all bg-slate-900 text-white border-slate-900 shadow-lg">Todo</button>
+                    <button onclick="filterProducts('Lentes de Sol')" class="filter-btn px-6 py-2.5 rounded-full text-sm font-semibold border border-slate-200 text-slate-600 hover:border-cyan-500 hover:text-cyan-700 bg-white transition-all">Lentes de Sol</button>
+                </div>
+
+                <div class="w-full max-w-md mx-auto mt-4 relative group">
+                    <input type="text" id="search-box" onkeyup="renderStore()" placeholder="Buscar modelo, marca o color..." 
+                           class="w-full bg-slate-50 border border-slate-200 rounded-full px-6 py-3 pl-12 outline-none focus:ring-2 focus:ring-cyan-500 transition-all text-slate-700 font-medium group-hover:bg-white group-hover:shadow-md">
+                    <i data-lucide="search" class="absolute left-4 top-3.5 w-5 h-5 text-gray-400 group-hover:text-cyan-500 transition-colors"></i>
+                </div>
+            </div>
+
+            <div id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                <div class="animate-pulse bg-slate-100 rounded-3xl h-96 border border-slate-200"></div>
+                <div class="animate-pulse bg-slate-100 rounded-3xl h-96 border border-slate-200"></div>
+            </div>
+
+            <div id="empty-store" class="hidden flex flex-col items-center justify-center py-24 text-center bg-slate-50 rounded-3xl border border-dashed border-slate-200">
+                <div class="bg-white p-4 rounded-full shadow-sm mb-4"><i data-lucide="search-x" class="w-8 h-8 text-slate-400"></i></div>
+                <h3 class="text-lg font-bold text-slate-700">No encontramos modelos</h3>
+                <p class="text-slate-500 text-sm">Intenta con otra búsqueda.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="quote" class="py-24 bg-slate-50 relative overflow-hidden scroll-mt-20">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 relative z-10">
+            <div class="text-center mb-12">
+                <span class="text-amber-600 font-bold tracking-wider uppercase text-sm bg-amber-50 px-3 py-1 rounded-full border border-amber-100">Servicio Personalizado</span>
+                <h2 class="text-4xl font-bold mt-4 mb-4 text-slate-900">Cotiza tus Lentes a Medida</h2>
+                <p class="text-slate-600 text-lg max-w-2xl mx-auto">Completa el formulario. Puedes escribir tu receta o enviarnos una foto.</p>
+            </div>
+            <div class="bg-white rounded-3xl shadow-xl border border-slate-100 overflow-hidden">
+                <div class="bg-slate-900 px-8 py-6 text-white flex items-center gap-4">
+                    <div class="bg-amber-500 p-3 rounded-xl text-slate-900"><i data-lucide="file-text" class="w-6 h-6"></i></div>
+                    <div><h3 class="font-bold text-xl">Solicitud de Presupuesto</h3><p class="text-slate-400 text-sm">Lentes Oftálmicos y de Sol con Medida</p></div>
+                </div>
+                <form id="quote-form" class="p-8 space-y-6" onsubmit="event.preventDefault(); submitQuote();">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div><label class="block text-xs font-bold text-slate-500 uppercase mb-2 ml-1">Tu Nombre</label><input type="text" id="q-name" required class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-amber-500 outline-none"></div>
+                        <div><label class="block text-xs font-bold text-slate-500 uppercase mb-2 ml-1">Tipo de Lente</label><select id="q-type" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-amber-500 outline-none"><option value="Monofocal">Monofocal (Cerca/Lejos)</option><option value="Multifocal">Multifocal / Progresivo</option><option value="Bifocal">Bifocal</option><option value="Sol con Medida">Sol con Medida</option><option value="Solo Montura">Solo busco Montura</option></select></div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-2 ml-1">Distancia Interpupilar (DIP) mm</label>
+                        <input type="text" id="q-dip" placeholder="Ej: 64mm (Opcional)" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-amber-500 outline-none">
+                    </div>
+                    <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200">
+                        <div class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
+                            <h4 class="font-bold text-slate-700 flex items-center gap-2"><i data-lucide="eye" class="w-4 h-4"></i> Tu Receta</h4>
+                            <div class="flex bg-white rounded-lg p-1 border border-slate-200 shadow-sm">
+                                <button type="button" onclick="toggleRxMode('manual')" id="btn-mode-manual" class="px-4 py-1.5 rounded-md text-xs font-bold bg-slate-900 text-white shadow transition-all">Manual</button>
+                                <button type="button" onclick="toggleRxMode('photo')" id="btn-mode-photo" class="px-4 py-1.5 rounded-md text-xs font-bold text-slate-500 hover:text-slate-900 transition-all">Enviar Foto</button>
+                            </div>
+                        </div>
+                        <div id="rx-manual-inputs">
+                            <div class="grid grid-cols-4 gap-3 text-center text-[10px] font-bold text-slate-400 mb-3 tracking-wider"><div>OJO</div><div>ESF</div><div>CIL</div><div>EJE</div></div>
+                            <div class="grid grid-cols-4 gap-3 items-center mb-3"><div class="text-sm font-bold text-slate-700 text-right pr-2">OD</div><input type="text" id="q-od-sph" class="bg-white border border-gray-200 rounded-lg p-2 text-center text-sm outline-none"><input type="text" id="q-od-cyl" class="bg-white border border-gray-200 rounded-lg p-2 text-center text-sm outline-none"><input type="text" id="q-od-ax" class="bg-white border border-gray-200 rounded-lg p-2 text-center text-sm outline-none"></div>
+                            <div class="grid grid-cols-4 gap-3 items-center"><div class="text-sm font-bold text-slate-700 text-right pr-2">OI</div><input type="text" id="q-oi-sph" class="bg-white border border-gray-200 rounded-lg p-2 text-center text-sm outline-none"><input type="text" id="q-oi-cyl" class="bg-white border border-gray-200 rounded-lg p-2 text-center text-sm outline-none"><input type="text" id="q-oi-ax" class="bg-white border border-gray-200 rounded-lg p-2 text-center text-sm outline-none"></div>
+                        </div>
+                        <div id="rx-photo-msg" class="hidden text-center py-4 bg-white rounded-xl border border-dashed border-slate-300">
+                            <i data-lucide="image" class="w-8 h-8 text-slate-300 mx-auto mb-2"></i>
+                            <p class="text-sm text-slate-600 font-medium">Adjuntarás la foto de tu receta en WhatsApp al finalizar.</p>
+                        </div>
+                    </div>
+                    <div><label class="block text-xs font-bold text-slate-500 uppercase mb-2 ml-1">Comentarios</label><textarea id="q-notes" rows="2" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-amber-500 outline-none resize-none"></textarea></div>
+                    <button type="submit" class="w-full btn-quote text-white font-bold py-4 rounded-xl shadow-lg flex justify-center items-center gap-2 text-lg transform hover:scale-[1.02] transition-all">Solicitar Cotización WhatsApp <i data-lucide="send" class="w-5 h-5"></i></button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <section id="contact" class="py-20 bg-slate-900 text-white relative overflow-hidden scroll-mt-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                <div>
+                    <span class="text-cyan-400 font-bold tracking-wider uppercase text-sm">Ayuda</span>
+                    <h2 class="text-4xl font-bold mt-2 mb-6">Estamos para ti</h2>
+                    <p class="text-slate-400 text-lg mb-8">Si tienes dudas sobre tu medida, envíos o modelos, escríbenos directamente.</p>
+                </div>
+                <div class="bg-white text-slate-900 p-8 rounded-3xl shadow-2xl border border-slate-200/50 relative">
+                    <h3 class="text-2xl font-bold mb-2 flex items-center gap-2 text-slate-800">Chat Directo <span class="text-green-500"><i data-lucide="message-circle" class="w-6 h-6"></i></span></h3>
+                    <form class="space-y-4" onsubmit="event.preventDefault(); window.sendToWhatsapp();">
+                        <input type="text" id="w-name" placeholder="Tu Nombre" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-4 outline-none focus:ring-2 focus:ring-green-500 transition-all text-lg" required>
+                        <textarea id="w-message" rows="3" placeholder="Hola, quisiera consultar sobre..." class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-green-500 transition-all resize-none" required></textarea>
+                        <button type="submit" class="w-full btn-whatsapp text-white font-bold py-4 rounded-xl shadow-lg flex justify-center items-center gap-2 transition-transform active:scale-95 text-lg"><i data-lucide="send" class="w-5 h-5"></i> Iniciar Chat</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="bg-slate-950 text-slate-400 py-16 border-t border-slate-900 text-sm">
+        <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-12">
+            <div class="col-span-1 md:col-span-2">
+                <div class="flex items-center gap-2 mb-6">
+                    <div class="bg-cyan-600 text-white p-1.5 rounded-lg font-bold">CV</div>
+                    <span class="text-white font-bold text-xl">Coottyvision</span>
+                </div>
+                <p class="text-slate-500 mb-6 max-w-xs">Especialistas en salud visual y moda óptica.</p>
+                <div class="flex gap-4">
+                    <a href="#" class="w-10 h-10 rounded-full bg-slate-900 flex items-center justify-center hover:bg-cyan-600 hover:text-white transition-all"><i data-lucide="facebook" class="w-5 h-5"></i></a>
+                    <a href="#" class="w-10 h-10 rounded-full bg-slate-900 flex items-center justify-center hover:bg-pink-600 hover:text-white transition-all"><i data-lucide="instagram" class="w-5 h-5"></i></a>
+                    <a href="#" class="w-10 h-10 rounded-full bg-slate-900 flex items-center justify-center hover:bg-slate-800 hover:text-white transition-all"><i data-lucide="music-2" class="w-5 h-5"></i></a>
+                </div>
+            </div>
+            <div>
+                <h4 class="text-white font-bold mb-6">Atención al Cliente</h4>
+                <ul class="space-y-4">
+                    <li><a href="#track-modal" onclick="toggleTrackModal()" class="hover:text-cyan-400 transition-colors">Rastrear Pedido</a></li>
+                    <li><a href="#quote" class="hover:text-cyan-400 transition-colors">Cotizar Lunas</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="text-white font-bold mb-6">Contacto</h4>
+                <ul class="space-y-4">
+                    <li class="flex items-start gap-3"><i data-lucide="map-pin" class="w-5 h-5 text-cyan-600 mt-0.5"></i> <span>Lima, Perú<br></span></li>
+                    <li class="flex items-center gap-3"><i data-lucide="phone" class="w-5 h-5 text-cyan-600"></i> <span>+51 974 559 091</span></li>
+                    <li class="flex items-center gap-3"><i data-lucide="CORREO" class="w-5 h-5 text-cyan-600"></i> <span></span></li>
+                </ul>
+            </div>
+        </div>
+        <div class="max-w-7xl mx-auto px-6 mt-16 pt-8 border-t border-slate-900 text-center text-slate-600 text-xs">
+            <p>En desarrollo por Marco Montoro</p>
+        </div>
+    </footer>
+
+    <div id="product-modal" class="fixed inset-0 z-[80] hidden flex items-center justify-center px-4">
+        <div class="absolute inset-0 bg-slate-900/80 backdrop-blur-md" onclick="closeProductModal()"></div>
+        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-2xl overflow-hidden relative z-10 flex flex-col md:flex-row animate-fade-in-up">
+            <button onclick="closeProductModal()" class="absolute top-4 right-4 z-20 bg-white/50 p-2 rounded-full hover:bg-white transition-all"><i data-lucide="x" class="w-5 h-5"></i></button>
+            <div class="w-full md:w-1/2 bg-gray-50 p-8 flex items-center justify-center">
+                <img id="pm-img" src="" class="max-h-64 object-contain drop-shadow-xl">
+            </div>
+            <div class="w-full md:w-1/2 p-8 flex flex-col">
+                <span id="pm-cat" class="text-cyan-600 font-bold text-xs uppercase tracking-wider mb-2">Categoría</span>
+                <h3 id="pm-title" class="text-2xl font-bold text-slate-900 mb-4 leading-tight">Nombre del Producto</h3>
+                <p id="pm-desc" class="text-slate-500 text-sm mb-6 flex-1">Descripción del producto aquí...</p>
+                <div class="flex items-center justify-between mt-auto">
+                    <span id="pm-price" class="text-3xl font-extrabold text-slate-900">S/0.00</span>
+                    <button id="pm-btn" class="btn-primary text-white px-6 py-3 rounded-xl font-bold shadow-lg hover:scale-105 transition-transform flex gap-2">
+                        Agregar <i data-lucide="shopping-bag" class="w-5 h-5"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="cart-modal" class="fixed inset-0 z-50 hidden"><div class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm transition-opacity duration-300" onclick="toggleCart()"></div><div class="absolute right-0 top-0 h-full w-full max-w-md bg-white shadow-2xl p-0 flex flex-col transform transition-transform duration-300 translate-x-full" id="cart-panel"><div class="p-6 border-b border-slate-100 flex justify-between items-center bg-white z-10"><h2 class="text-xl font-bold flex items-center gap-2 text-slate-800"><i data-lucide="shopping-bag" class="w-5 h-5 text-cyan-600"></i> Tu Pedido</h2><button onclick="toggleCart()" class="p-2 hover:bg-slate-100 rounded-full transition-colors text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-6 h-6"></i></button></div><div id="cart-items" class="flex-1 overflow-y-auto p-6 space-y-4 bg-slate-50"></div><div class="p-6 border-t border-slate-100 bg-white shadow-lg z-10"><div class="flex justify-between items-center mb-6"><span class="text-slate-500 font-medium">Subtotal</span><span id="cart-total" class="text-3xl font-bold text-slate-900">S/0.00</span></div><button onclick="initCheckout()" class="w-full btn-primary text-white py-4 rounded-xl font-bold shadow-lg flex justify-center items-center gap-2">Confirmar Pedido <i data-lucide="arrow-right" class="w-5 h-5"></i></button></div></div></div>
+    
+    <div id="payment-modal" class="fixed inset-0 z-[60] hidden flex items-center justify-center px-4">
+        <div class="absolute inset-0 bg-slate-900/80 backdrop-blur-md" onclick="togglePaymentModal()"></div>
+        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-2xl p-0 relative z-10 animate-fade-in-up overflow-hidden flex flex-col max-h-[90vh]">
+            <div class="bg-slate-900 px-8 py-5 text-white flex justify-between items-center flex-shrink-0">
+                <div>
+                    <h3 class="font-bold text-xl mb-0.5 flex items-center gap-2"><i data-lucide="truck" class="w-5 h-5 text-cyan-400"></i> Finalizar Compra</h3>
+                    <p class="text-slate-400 text-sm">Completa tus datos de envío</p>
+                </div>
+                <button onclick="togglePaymentModal()" class="p-2 hover:bg-slate-800 rounded-full transition-colors"><i data-lucide="x" class="w-6 h-6 text-slate-400"></i></button>
+            </div>
+            <div class="flex-1 overflow-y-auto p-8">
+                <form onsubmit="event.preventDefault(); processPayment();" class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="space-y-4">
+                        <h4 class="font-bold text-slate-800 border-b border-gray-100 pb-2 mb-4">📍 ¿Dónde lo enviamos?</h4>
+                        <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1 ml-1">Tu Nombre Completo</label><input type="text" id="pay-name" placeholder="Ej: Juan Pérez" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-cyan-500 font-bold text-slate-800" required></div>
+                        <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1 ml-1">Celular / WhatsApp</label><input type="tel" id="pay-phone" placeholder="Ej: 999 999 999" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-cyan-500" required></div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1 ml-1">Ciudad</label><input type="text" id="pay-city" placeholder="Ej: Lima" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-cyan-500" required></div>
+                            <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1 ml-1">Distrito</label><input type="text" id="pay-district" placeholder="Ej: Miraflores" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-cyan-500" required></div>
+                        </div>
+                        <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1 ml-1">Dirección Exacta</label><input type="text" id="pay-address" placeholder="Av. Larco 123, Dpto 401" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-cyan-500" required></div>
+                        <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1 ml-1">Referencia (Opcional)</label><input type="text" id="pay-ref" placeholder="Ej: Frente al parque..." class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-cyan-500"></div>
+                    </div>
+                    <div class="bg-slate-50 p-6 rounded-3xl border border-slate-200 flex flex-col">
+                        <h4 class="font-bold text-slate-800 border-b border-gray-200 pb-2 mb-4">💳 Realizar Pago</h4>
+                        <div class="text-center mb-4">
+                            <p class="text-sm text-slate-500 mb-2 font-medium">Escanea QR Yape/Plin</p>
+                            <div class="bg-white p-3 rounded-2xl inline-block shadow-sm border border-gray-100"><img src="cfc6f172-306d-48d7-a0bb-1861e116f771.jpg" class="w-32 h-32 object-contain opacity-80 mix-blend-multiply mx-auto"></div>
+                        </div>
+                        <div class="flex justify-center mb-6"><button type="button" onclick="copyNumber('974559091')" class="w-full flex items-center justify-between px-4 py-3 bg-white hover:bg-slate-100 rounded-xl border border-slate-200 transition-all group active:scale-95"><span class="font-bold text-slate-600 text-sm">974 559 091</span><div class="text-cyan-600 font-bold text-xs bg-cyan-50 px-2 py-1 rounded flex items-center gap-1"><i data-lucide="copy" class="w-3 h-3"></i> Copiar</div></button></div>
+                        <div class="mt-auto border-t border-slate-200 pt-4">
+                            <div class="flex justify-between items-center mb-4"><span class="text-slate-500 font-medium">Total a Pagar</span><span id="pay-total" class="text-2xl font-extrabold text-slate-900">S/0.00</span></div>
+                            <button type="submit" id="btn-pay-submit" class="w-full btn-whatsapp text-white font-bold py-4 rounded-xl shadow-lg flex justify-center items-center gap-2 text-lg transition-transform active:scale-95"><i data-lucide="message-circle" class="w-6 h-6"></i> Confirmar Pedido</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div id="track-modal" class="fixed inset-0 z-[70] hidden flex items-center justify-center px-4"><div class="absolute inset-0 bg-slate-900/80 backdrop-blur-md" onclick="toggleTrackModal()"></div><div class="bg-white rounded-3xl shadow-2xl w-full max-w-md p-0 relative z-10 animate-fade-in-up"><div class="bg-slate-900 px-6 py-5 flex justify-between items-center text-white rounded-t-3xl"><h3 class="font-bold text-lg flex items-center gap-2"><i data-lucide="package-search" class="w-5 h-5 text-cyan-400"></i> Rastrea tu Pedido</h3><button onclick="toggleTrackModal()" class="hover:text-cyan-400"><i data-lucide="x" class="w-5 h-5"></i></button></div><div class="p-8"><div class="space-y-4"><div><label class="block text-xs font-bold text-slate-500 uppercase mb-1 ml-1">ID de Pedido</label><div class="relative"><input type="text" id="track-id" placeholder="Ej: #A1B2C3" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 pl-10 outline-none focus:ring-2 focus:ring-cyan-500 uppercase"><i data-lucide="search" class="absolute left-3 top-3.5 w-4 h-4 text-gray-400"></i></div></div><button onclick="trackOrder()" class="w-full btn-primary text-white py-3 rounded-xl font-bold shadow-lg">Buscar</button></div><div id="track-result" class="hidden mt-8 pt-6 border-t border-dashed border-gray-200"><div class="text-center mb-6"><h4 class="font-bold text-xl text-slate-800">Estado Actual</h4><p class="text-sm text-slate-500" id="track-status-text">Buscando...</p></div><div class="relative flex justify-between items-center mb-8 px-2"><div class="timeline-line"></div><div class="timeline-line-fill" id="track-fill" style="width: 0%;"></div><div class="timeline-step" id="step-pending">1</div><div class="timeline-step" id="step-processing">2</div><div class="timeline-step" id="step-shipped">3</div><div class="timeline-step" id="step-completed">4</div></div><div class="flex justify-between text-[10px] font-bold text-slate-400 uppercase tracking-wider"><span>Recibido</span><span>Taller</span><span>Ruta</span><span>Entregado</span></div></div></div></div></div>
+    
+    <div id="toast-container" class="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 flex flex-col gap-3 pointer-events-none"></div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, increment, getDoc, runTransaction, setDoc, query, where, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+    const firebaseConfig = { apiKey: "AIzaSyCWCM5aXMS8OgcJ5vEES6WV17Hhymfngyw", authDomain: "coottyvision-hd.firebaseapp.com", projectId: "coottyvision-hd", storageBucket: "coottyvision-hd.firebasestorage.app", messagingSenderId: "204138808996", appId: "1:204138808996:web:ff65a968cd5853d52e0831" };
+    const app = initializeApp(firebaseConfig); const auth = getAuth(app); const db = getFirestore(app);
+    
+    let cart = []; 
+    let allProducts = []; 
+    let currentUser = null;
+    let currentFilter = 'all';
+    let rxMode = 'manual';
+
+    // 1. CARGAR CARRITO PERSISTENTE AL INICIAR
+    const savedCart = localStorage.getItem('cv_cart');
+    if (savedCart) { cart = JSON.parse(savedCart); }
+
+    // AUTH: Google Login
+    const provider = new GoogleAuthProvider();
+    window.loginGoogle = async () => { try { await signInWithPopup(auth, provider); } catch(e) { console.error(e); } };
+    window.logout = () => signOut(auth);
+
+    onAuthStateChanged(auth, async (user) => {
+        currentUser = user;
+        const btnLogin = document.getElementById('btn-login');
+        const userMenu = document.getElementById('user-menu');
+        
+        if(user) {
+            btnLogin.classList.add('hidden');
+            userMenu.classList.remove('hidden'); userMenu.classList.add('flex');
+            document.getElementById('user-name').innerText = user.displayName.split(' ')[0];
+            document.getElementById('user-photo').src = user.photoURL;
+            
+            // Cargar datos de envío previos si existen
+            const userDoc = await getDoc(doc(db, 'users', user.uid));
+            if(userDoc.exists()) {
+                const d = userDoc.data();
+                if(document.getElementById('pay-name')) {
+                    document.getElementById('pay-name').value = d.name || user.displayName;
+                    document.getElementById('pay-phone').value = d.phone || '';
+                    document.getElementById('pay-city').value = d.city || '';
+                    document.getElementById('pay-district').value = d.district || '';
+                    document.getElementById('pay-address').value = d.address || '';
+                }
+            }
+        } else {
+            btnLogin.classList.remove('hidden');
+            userMenu.classList.add('hidden'); userMenu.classList.remove('flex');
+        }
+        
+        // Cargar Productos
+        onSnapshot(collection(db, 'products'), snap => { 
+            allProducts = snap.docs.map(d => ({id: d.id, ...d.data()})); 
+            renderStore();
+            // Actualizar UI del carrito al cargar productos (por si cambió precio/foto)
+            if(savedCart) updateCartUI(); 
+        });
+    });
+
+    // --- LÓGICA DE TIENDA ---
+    window.filterProducts = (c) => { currentFilter = c; document.querySelectorAll('.filter-btn').forEach(b => { b.classList.remove('bg-slate-900', 'text-white', 'shadow-lg'); b.classList.add('bg-white', 'text-slate-600', 'border-slate-200'); }); event.target.classList.remove('bg-white', 'text-slate-600', 'border-slate-200'); event.target.classList.add('bg-slate-900', 'text-white', 'shadow-lg'); renderStore(); };
+
+    window.renderStore = () => {
+        const grid = document.getElementById('products-grid'); 
+        const empty = document.getElementById('empty-store');
+        const searchTerm = document.getElementById('search-box').value.toLowerCase();
+        
+        let filtered = allProducts.filter(p => {
+            const matchCategory = currentFilter === 'all' || p.category === currentFilter;
+            const matchSearch = p.name.toLowerCase().includes(searchTerm) || (p.description && p.description.toLowerCase().includes(searchTerm));
+            return matchCategory && matchSearch;
+        });
+
+        grid.innerHTML = '';
+        if(filtered.length === 0) { grid.classList.add('hidden'); empty.classList.remove('hidden'); return; }
+        empty.classList.add('hidden'); grid.classList.remove('hidden');
+
+        filtered.forEach(p => {
+            const inCart = cart.filter(i => i.id === p.id).length;
+            const stock = p.stock - inCart;
+            const soldOut = stock <= 0;
+            const hasDiscount = p.originalPrice && p.originalPrice > p.price;
+            const discountBadge = hasDiscount ? `<span class="absolute top-4 right-4 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded-full shadow-sm">-${Math.round((1 - p.price/p.originalPrice)*100)}%</span>` : '';
+            const priceDisplay = hasDiscount ? `<div class="flex flex-col items-start"><span class="text-xs text-gray-400 line-through">S/${parseFloat(p.originalPrice).toFixed(2)}</span><span class="text-2xl font-extrabold text-cyan-700">S/${parseFloat(p.price).toFixed(2)}</span></div>` : `<span class="text-2xl font-extrabold text-slate-900">S/${parseFloat(p.price).toFixed(2)}</span>`;
+            const btn = soldOut ? `<button disabled class="bg-slate-100 text-slate-400 w-10 h-10 rounded-full flex items-center justify-center cursor-not-allowed"><i data-lucide="x" class="w-5 h-5"></i></button>` : `<button onclick="event.stopPropagation(); window.addToCart('${p.id}')" class="bg-cyan-700 text-white w-10 h-10 rounded-full flex items-center justify-center hover:bg-cyan-800 transition-all shadow-lg hover:scale-110 active:scale-95"><i data-lucide="plus" class="w-5 h-5"></i></button>`;
+            const lbl = soldOut ? `<span class="text-red-500 font-bold text-xs uppercase">Agotado</span>` : `<span class="text-xs text-slate-400 font-medium">Stock: ${stock}</span>`;
+
+            const card = document.createElement('div'); 
+            card.className = `product-card bg-white rounded-3xl shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] border border-gray-100 overflow-hidden flex flex-col group h-full cursor-pointer ${soldOut ? 'sold-out' : ''}`;
+            card.onclick = () => window.openProductModal(p.id);
+            card.innerHTML = `<div class="h-64 overflow-hidden bg-gray-50 relative p-8 flex items-center justify-center"><img src="${p.imageUrl}" class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500 drop-shadow-xl" onerror="this.src='https://via.placeholder.com/300'"><div class="absolute top-4 left-4 flex gap-1"><span class="bg-white/90 backdrop-blur px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider text-slate-600 border border-white shadow-sm">${p.category}</span></div>${discountBadge}</div><div class="p-6 flex-1 flex flex-col"><div class="flex items-start justify-between mb-2 gap-2"><h3 class="font-bold text-lg text-slate-800 leading-tight line-clamp-2">${p.name}</h3></div><div class="mb-6 flex items-center w-full">${lbl}</div><div class="mt-auto flex justify-between items-center pt-4 border-t border-slate-50">${priceDisplay}${btn}</div></div>`;
+            grid.appendChild(card);
+        });
+        lucide.createIcons();
+    }
+
+    // --- CARRITO ---
+    window.addToCart = (id) => { 
+        const p = allProducts.find(x => x.id === id); 
+        const c = cart.filter(i => i.id === id).length; 
+        if(!p || (p.stock - c) <= 0) { showToast("Sin stock disponible"); return; } 
+        cart.push(p); 
+        updateCartUI(); renderStore(); showToast(`Agregado: ${p.name}`); 
+    };
+    
+    window.removeFromCart = (idx) => { cart.splice(idx, 1); updateCartUI(); renderStore(); };
+    
+    function updateCartUI() {
+        localStorage.setItem('cv_cart', JSON.stringify(cart));
+        const container = document.getElementById('cart-items'); container.innerHTML = ''; let total = 0;
+        document.getElementById('cart-count').innerText = cart.length; document.getElementById('cart-count').classList.toggle('hidden', cart.length === 0);
+        document.getElementById('cart-count-mobile').innerText = cart.length; document.getElementById('cart-count-mobile').classList.toggle('hidden', cart.length === 0);
+        
+        if(cart.length === 0) { container.innerHTML = `<div class="flex flex-col items-center justify-center h-64 text-slate-300"><i data-lucide="shopping-basket" class="w-16 h-16 mb-4 opacity-20"></i><p class="text-sm">Tu carrito está vacío</p></div>`; } 
+        else { cart.forEach((item, idx) => { total += parseFloat(item.price); container.innerHTML += `<div class="flex gap-4 items-start bg-white p-4 rounded-2xl border border-slate-100 shadow-sm"><img src="${item.imageUrl}" class="w-16 h-16 rounded-xl object-cover bg-gray-50 border border-gray-100"><div class="flex-1 min-w-0"><h4 class="font-bold text-sm text-slate-800 truncate">${item.name}</h4><p class="text-teal-600 font-bold text-sm">S/${item.price}</p></div><button onclick="removeFromCart(${idx})" class="w-8 h-8 flex items-center justify-center text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-full transition-all"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div>`; }); }
+        
+        document.getElementById('cart-total').innerText = 'S/' + total.toFixed(2); 
+        if(document.getElementById('pay-total')) document.getElementById('pay-total').innerText = 'S/' + total.toFixed(2); 
+        lucide.createIcons();
+    }
+
+    // --- PROCESO DE PAGO SEGURO (CON TRANSACCIÓN) ---
+    window.processPayment = async () => {
+        if(cart.length === 0) return;
+        const name = document.getElementById('pay-name').value.trim();
+        const phone = document.getElementById('pay-phone').value.trim();
+        const city = document.getElementById('pay-city').value.trim();
+        const district = document.getElementById('pay-district').value.trim();
+        const address = document.getElementById('pay-address').value.trim();
+        const ref = document.getElementById('pay-ref').value.trim();
+        if(!name || !phone || !city || !district || !address) return alert("Por favor completa los datos de envío.");
+
+        const btn = document.getElementById('btn-pay-submit');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = `<i data-lucide="loader-2" class="w-5 h-5 animate-spin"></i> Verificando Stock...`; btn.disabled = true;
+
+        try {
+            const orderId = '#' + Math.random().toString(36).substr(2, 6).toUpperCase();
+            const total = cart.reduce((acc, i) => acc + parseFloat(i.price), 0);
+            const itemCounts = {}; cart.forEach(item => { itemCounts[item.id] = (itemCounts[item.id] || 0) + 1; });
+
+            await runTransaction(db, async (transaction) => {
+                for (const [pid, qty] of Object.entries(itemCounts)) {
+                    const sfDocRef = doc(db, "products", pid);
+                    const sfDoc = await transaction.get(sfDocRef);
+                    if (!sfDoc.exists()) throw "Producto no existe";
+                    const newStock = sfDoc.data().stock - qty;
+                    if (newStock < 0) throw `Lo sentimos, ${sfDoc.data().name} se acaba de agotar.`;
+                    transaction.update(sfDocRef, { stock: newStock });
+                }
+            });
+
+            const orderData = { orderId, items: cart, total, status: 'pending', date: new Date().toISOString(), customer: { name, phone, city, district, address, ref }, uid: currentUser ? currentUser.uid : 'guest', paymentMethod: 'Yape/Plin' };
+            await addDoc(collection(db, 'orders'), orderData);
+
+            if(currentUser) { await setDoc(doc(db, 'users', currentUser.uid), { name, phone, city, district, address, lastOrder: new Date().toISOString() }, { merge: true }); }
+
+            const itemsList = cart.map(i => `• ${i.name}`).join('\n');
+            const waText = `*NUEVO PEDIDO ${orderId}* 🛍️\n\n👤 *Cliente:* ${name}\n📱 *Celular:* ${phone}\n📍 *Destino:* ${city}, ${district}\n🏠 *Dirección:* ${address}\n\n🛒 *Productos:*\n${itemsList}\n\n💰 *Total: S/${total.toFixed(2)}*\n🧾 *Envío mi constancia de pago.*`;
+            window.open(`https://wa.me/51974559091?text=${encodeURIComponent(waText)}`, '_blank');
+            
+            cart = []; updateCartUI(); localStorage.removeItem('cv_cart'); window.togglePaymentModal(); showToast("¡Pedido registrado exitosamente!");
+            setTimeout(() => { document.getElementById('pay-address').value = ''; document.getElementById('pay-ref').value = ''; }, 2000);
+            
+        } catch(e) { alert("⚠️ Error: " + e); } finally { btn.innerHTML = originalText; btn.disabled = false; }
+    };
+
+    // --- FUNCIONES RESTAURADAS (Cotización, Rastreo, Utils) ---
+    window.toggleRxMode = (mode) => {
+        rxMode = mode;
+        const manual = document.getElementById('rx-manual-inputs');
+        const photo = document.getElementById('rx-photo-msg');
+        const btnManual = document.getElementById('btn-mode-manual');
+        const btnPhoto = document.getElementById('btn-mode-photo');
+        
+        if (mode === 'manual') {
+            manual.classList.remove('hidden'); photo.classList.add('hidden');
+            btnManual.className = "px-4 py-1.5 rounded-md text-xs font-bold bg-slate-900 text-white shadow transition-all";
+            btnPhoto.className = "px-4 py-1.5 rounded-md text-xs font-bold text-slate-500 hover:text-slate-900 transition-all";
+        } else {
+            manual.classList.add('hidden'); photo.classList.remove('hidden');
+            btnManual.className = "px-4 py-1.5 rounded-md text-xs font-bold text-slate-500 hover:text-slate-900 transition-all";
+            btnPhoto.className = "px-4 py-1.5 rounded-md text-xs font-bold bg-slate-900 text-white shadow transition-all";
+        }
+    };
+
+    window.submitQuote = async () => {
+        const name = document.getElementById('q-name').value;
+        const type = document.getElementById('q-type').value;
+        const notes = document.getElementById('q-notes').value;
+        const dip = document.getElementById('q-dip').value;
+        let od, oi, method;
+
+        if (rxMode === 'manual') {
+            od = `OD: ${document.getElementById('q-od-sph').value || '0.00'} / ${document.getElementById('q-od-cyl').value || '0.00'} x ${document.getElementById('q-od-ax').value || '0°'}`;
+            oi = `OI: ${document.getElementById('q-oi-sph').value || '0.00'} / ${document.getElementById('q-oi-cyl').value || '0.00'} x ${document.getElementById('q-oi-ax').value || '0°'}`;
+            method = "Datos Manuales";
+        } else {
+            od = "Envía Foto"; oi = "Envía Foto"; method = "Foto por WhatsApp";
+        }
+
+        if(!name) return alert("Ingresa tu nombre");
+        try { await addDoc(collection(db, 'quotes'), { name, type, notes, dip, prescription: { od, oi, method }, date: new Date().toISOString(), status: 'new' }); } catch(e) {}
+        const phone = "51974559091"; 
+        const text = `Hola Coottyvision, soy ${name}. Cotización: ${type}.\nDIP: ${dip || 'No indicada'}\nReceta: ${method} (${od}, ${oi})\nNotas: ${notes}`;
+        window.open(`https://wa.me/${phone}?text=${encodeURIComponent(text)}`, '_blank');
+    };
+
+    window.sendToWhatsapp = () => { const n = document.getElementById('w-name').value; const m = document.getElementById('w-message').value; if(!n||!m) return alert("Faltan datos"); window.open(`https://wa.me/51974559091?text=${encodeURIComponent(`Hola, soy ${n}. ${m}`)}`, '_blank'); };
+
+    window.toggleTrackModal = () => { document.getElementById('track-modal').classList.toggle('hidden'); document.getElementById('track-result').classList.add('hidden'); document.getElementById('track-id').value = ''; };
+    window.trackOrder = async () => {
+        let id = document.getElementById('track-id').value.trim().toUpperCase(); if(!id) return alert("Código?"); if(!id.startsWith('#')) id = '#' + id;
+        try { const q = query(collection(db, 'orders'), where('orderId', '==', id)); const snap = await getDocs(q); if(!snap.empty) { const d = snap.docs[0].data(); showTrackingResult(d.status); } else { alert("No encontrado."); } } catch(e) { alert("Error"); }
+    };
+    function showTrackingResult(s) {
+        document.getElementById('track-result').classList.remove('hidden'); const steps = ['pending', 'processing', 'shipped', 'completed']; let idx = 0; let t = "Recibido";
+        if(s=='pending') { idx=0; t="Recibido"; } else if(s=='processing') { idx=1; t="En Taller"; } else if(s=='shipped') { idx=2; t="En Camino"; } else if(s=='completed') { idx=3; t="Entregado"; }
+        document.getElementById('track-status-text').innerText = t; document.getElementById('track-fill').style.width = `${(idx/3)*100}%`;
+        steps.forEach((st, i) => { const dot = document.getElementById(`step-${st}`); if(i <= idx) { dot.className = "timeline-step active"; dot.innerHTML = '<i data-lucide="check" class="w-4 h-4"></i>'; } else { dot.className = "timeline-step"; dot.innerHTML = i+1; } }); lucide.createIcons();
+    }
+
+    // Funciones de UI Modales
+    window.toggleCart = () => { const m = document.getElementById('cart-modal'); const p = document.getElementById('cart-panel'); if(m.classList.contains('hidden')) { m.classList.remove('hidden'); setTimeout(() => p.classList.remove('translate-x-full'), 10); } else { p.classList.add('translate-x-full'); setTimeout(() => m.classList.add('hidden'), 300); } };
+    window.togglePaymentModal = () => document.getElementById('payment-modal').classList.toggle('hidden');
+    window.initCheckout = () => { if(cart.length === 0) return; window.toggleCart(); window.togglePaymentModal(); };
+    window.openProductModal = (id) => { const p = allProducts.find(x => x.id === id); if(!p) return; document.getElementById('pm-img').src = p.imageUrl; document.getElementById('pm-cat').innerText = p.category; document.getElementById('pm-title').innerText = p.name; document.getElementById('pm-desc').innerText = p.description || ""; document.getElementById('pm-price').innerText = `S/${parseFloat(p.price).toFixed(2)}`; const btn = document.getElementById('pm-btn'); btn.onclick = () => { window.addToCart(p.id); window.closeProductModal(); }; document.getElementById('product-modal').classList.remove('hidden'); };
+    window.closeProductModal = () => document.getElementById('product-modal').classList.add('hidden');
+    window.showToast = (m) => { const c = document.getElementById('toast-container'); const t = document.createElement('div'); t.className = 'bg-slate-900 text-white px-6 py-3 rounded-full shadow-2xl flex items-center gap-3 text-sm font-bold toast-enter transition-all duration-300 pointer-events-auto min-w-[200px] justify-center mb-4'; t.innerHTML = `<i data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i> ${m}`; c.appendChild(t); lucide.createIcons(); requestAnimationFrame(() => { t.classList.remove('toast-enter'); t.classList.add('toast-enter-active'); }); setTimeout(() => { t.classList.remove('toast-enter-active'); t.classList.add('toast-exit-active'); setTimeout(() => t.remove(), 300); }, 3000); };
+    window.copyNumber = (n) => { navigator.clipboard.writeText(n).then(() => showToast("Copiado!")).catch(() => showToast("Copiado!")); };
+
+    lucide.createIcons();
+</script>
+
+</body>
+</html>
