@@ -342,10 +342,15 @@
     let currentFilter = 'all';
     let rxMode = 'manual';
 
-    // 1. CARGAR CARRITO PERSISTENTE AL INICIAR
+// 1. CARGAR CARRITO PERSISTENTE AL INICIAR
     const savedCart = localStorage.getItem('cv_cart');
-    if (savedCart) { cart = JSON.parse(savedCart); }
-
+    if (savedCart) { 
+        cart = JSON.parse(savedCart);
+        // TRUCO: Esperamos medio segundo para asegurar que la página cargó y forzamos que se muestre el carrito
+        setTimeout(() => {
+            if(typeof updateCartUI === 'function') updateCartUI();
+        }, 500);
+    }
     // AUTH: Google Login
     const provider = new GoogleAuthProvider();
     window.loginGoogle = async () => { try { await signInWithPopup(auth, provider); } catch(e) { console.error(e); } };
@@ -564,4 +569,5 @@
 </script>
 
 </body>
+
 </html>
