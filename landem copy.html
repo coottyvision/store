@@ -479,7 +479,16 @@ onAuthStateChanged(auth, async (user) => {
     
     function updateCartUI() {
         localStorage.setItem('cv_cart', JSON.stringify(cart));
+
+        // 2. NUEVO: Guardar en Cuenta de Google (Firebase)
+        if (currentUser) {
+            // Usamos setDoc con merge:true para no borrar otros datos del usuario (como su dirección)
+            setDoc(doc(db, 'users', currentUser.uid), { cart: cart }, { merge: true })
+                .catch(e => console.log("Error sincronizando carrito:", e));
+        }
+        localStorage.setItem('cv_cart', JSON.stringify(cart));
         const container = document.getElementById('cart-items'); container.innerHTML = ''; let total = 0;
+        const container = document.getElementById('cart-items');
         document.getElementById('cart-count').innerText = cart.length; document.getElementById('cart-count').classList.toggle('hidden', cart.length === 0);
         document.getElementById('cart-count-mobile').innerText = cart.length; document.getElementById('cart-count-mobile').classList.toggle('hidden', cart.length === 0);
         
@@ -613,5 +622,6 @@ window.toggleMobileMenu = () => {
 </body>
 
 </html>
+
 
 
