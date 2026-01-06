@@ -477,26 +477,45 @@ onAuthStateChanged(auth, async (user) => {
     
     window.removeFromCart = (idx) => { cart.splice(idx, 1); updateCartUI(); renderStore(); };
     
-    function updateCartUI() {
+function updateCartUI() {
+        // 1. Guardar en LocalStorage
         localStorage.setItem('cv_cart', JSON.stringify(cart));
 
-        // 2. NUEVO: Guardar en Cuenta de Google (Firebase)
+        // 2. Guardar en Cuenta de Google (Si hay usuario)
         if (currentUser) {
-            // Usamos setDoc con merge:true para no borrar otros datos del usuario (como su dirección)
             setDoc(doc(db, 'users', currentUser.uid), { cart: cart }, { merge: true })
-                .catch(e => console.log("Error sincronizando carrito:", e));
+                .catch(e => console.log("Error sync:", e));
         }
-        localStorage.setItem('cv_cart', JSON.stringify(cart));
-        const container = document.getElementById('cart-items'); container.innerHTML = ''; let total = 0;
-        const container = document.getElementById('cart-items');
-        document.getElementById('cart-count').innerText = cart.length; document.getElementById('cart-count').classList.toggle('hidden', cart.length === 0);
-        document.getElementById('cart-count-mobile').innerText = cart.length; document.getElementById('cart-count-mobile').classList.toggle('hidden', cart.length === 0);
+
+        // 3. Actualizar la vista (HTML)
+        const container = document.getElementById('cart-items'); // Declarado una sola vez
+        container.innerHTML = ''; 
+        let total = 0;
+
+        // Actualizar contadores
+        const countElements = [document.getElementById('cart-count'), document.getElementById('cart-count-mobile')];
+        countElements.forEach(el => {
+            if(el) {
+                el.innerText = cart.length;
+                el.classList.toggle('hidden', cart.length === 0);
+            }
+        });
         
-        if(cart.length === 0) { container.innerHTML = `<div class="flex flex-col items-center justify-center h-64 text-slate-300"><i data-lucide="shopping-basket" class="w-16 h-16 mb-4 opacity-20"></i><p class="text-sm">Tu carrito está vacío</p></div>`; } 
-        else { cart.forEach((item, idx) => { total += parseFloat(item.price); container.innerHTML += `<div class="flex gap-4 items-start bg-white p-4 rounded-2xl border border-slate-100 shadow-sm"><img src="${item.imageUrl}" class="w-16 h-16 rounded-xl object-cover bg-gray-50 border border-gray-100"><div class="flex-1 min-w-0"><h4 class="font-bold text-sm text-slate-800 truncate">${item.name}</h4><p class="text-teal-600 font-bold text-sm">S/${item.price}</p></div><button onclick="removeFromCart(${idx})" class="w-8 h-8 flex items-center justify-center text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-full transition-all"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div>`; }); }
+        // Dibujar productos
+        if(cart.length === 0) { 
+            container.innerHTML = `<div class="flex flex-col items-center justify-center h-64 text-slate-300"><i data-lucide="shopping-basket" class="w-16 h-16 mb-4 opacity-20"></i><p class="text-sm">Tu carrito está vacío</p></div>`; 
+        } else { 
+            cart.forEach((item, idx) => { 
+                total += parseFloat(item.price); 
+                container.innerHTML += `<div class="flex gap-4 items-start bg-white p-4 rounded-2xl border border-slate-100 shadow-sm"><img src="${item.imageUrl}" class="w-16 h-16 rounded-xl object-cover bg-gray-50 border border-gray-100"><div class="flex-1 min-w-0"><h4 class="font-bold text-sm text-slate-800 truncate">${item.name}</h4><p class="text-teal-600 font-bold text-sm">S/${item.price}</p></div><button onclick="removeFromCart(${idx})" class="w-8 h-8 flex items-center justify-center text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-full transition-all"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div>`; 
+            }); 
+        }
         
-        document.getElementById('cart-total').innerText = 'S/' + total.toFixed(2); 
-        if(document.getElementById('pay-total')) document.getElementById('pay-total').innerText = 'S/' + total.toFixed(2); 
+        // Actualizar totales
+        const totalText = 'S/' + total.toFixed(2);
+        document.getElementById('cart-total').innerText = totalText; 
+        if(document.getElementById('pay-total')) document.getElementById('pay-total').innerText = totalText; 
+        
         lucide.createIcons();
     }
 
@@ -622,6 +641,7 @@ window.toggleMobileMenu = () => {
 </body>
 
 </html>
+
 
 
 
