@@ -163,10 +163,8 @@
                 </h2>
                 <p class="text-slate-500">Encuentra tu estilo perfecto.</p>
                 
-                <div class="flex flex-wrap justify-center gap-3 mt-4">
-                    <button onclick="filterProducts('all')" class="filter-btn active px-6 py-2.5 rounded-full text-sm font-semibold border transition-all bg-slate-900 text-white border-slate-900 shadow-lg">Todo</button>
-                    <button onclick="filterProducts('Lentes de Sol')" class="filter-btn px-6 py-2.5 rounded-full text-sm font-semibold border border-slate-200 text-slate-600 hover:border-cyan-500 hover:text-cyan-700 bg-white transition-all">Lentes de Sol</button>
-                </div>
+                <div id="category-filters" class="flex flex-wrap justify-center gap-3 mt-4">
+                    </div>
 
                 <div class="w-full max-w-md mx-auto mt-4 relative group">
                     <input type="text" id="search-box" onkeyup="renderStore()" placeholder="Buscar modelo, marca o color..." 
@@ -521,9 +519,22 @@
         });
     });
     
+    // Dentro de onAuthStateChanged...
+        onSnapshot(collection(db, 'products'), snap => { 
+            allProducts = snap.docs.map(d => ({id: d.id, ...d.data()})); 
+            
+            renderStore();           // Dibuja los productos
+            renderCategoryButtons(); // <--- ¡AGREGA ESTA LÍNEA AQUÍ!
+            
+            if(savedCart) updateCartUI(); 
+        });
+
+
+
     // --- LÓGICA DE TIENDA ---
     window.filterProducts = (c) => { currentFilter = c; document.querySelectorAll('.filter-btn').forEach(b => { b.classList.remove('bg-slate-900', 'text-white', 'shadow-lg'); b.classList.add('bg-white', 'text-slate-600', 'border-slate-200'); }); event.target.classList.remove('bg-white', 'text-slate-600', 'border-slate-200'); event.target.classList.add('bg-slate-900', 'text-white', 'shadow-lg'); renderStore(); };
 
+// Reemplaza tu función window.renderStore por esta:
     window.renderStore = () => {
         const grid = document.getElementById('products-grid'); 
         const empty = document.getElementById('empty-store');
@@ -531,7 +542,11 @@
         
         let filtered = allProducts.filter(p => {
             const matchCategory = currentFilter === 'all' || p.category === currentFilter;
-            const matchSearch = p.name.toLowerCase().includes(searchTerm) || (p.description && p.description.toLowerCase().includes(searchTerm));
+            // AHORA BUSCAMOS TAMBIÉN EN LA MARCA (p.brand)
+            const brand = p.brand ? p.brand.toLowerCase() : '';
+            const matchSearch = p.name.toLowerCase().includes(searchTerm) || 
+                                (p.description && p.description.toLowerCase().includes(searchTerm)) ||
+                                brand.includes(searchTerm);
             return matchCategory && matchSearch;
         });
 
@@ -544,20 +559,41 @@
             const stock = p.stock - inCart;
             const soldOut = stock <= 0;
             const hasDiscount = p.originalPrice && p.originalPrice > p.price;
-            const discountBadge = hasDiscount ? `<span class="absolute top-4 right-4 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded-full shadow-sm">-${Math.round((1 - p.price/p.originalPrice)*100)}%</span>` : '';
-            const priceDisplay = hasDiscount ? `<div class="flex flex-col items-start"><span class="text-xs text-gray-400 line-through">S/${parseFloat(p.originalPrice).toFixed(2)}</span><span class="text-2xl font-extrabold text-cyan-700">S/${parseFloat(p.price).toFixed(2)}</span></div>` : `<span class="text-2xl font-extrabold text-slate-900">S/${parseFloat(p.price).toFixed(2)}</span>`;
+            
+            // UI Components
+            const discountBadge = hasDiscount ? `<span class="absolute top-4 right-4 bg-red-600 text-white text-[10px] font-bold px-2 py-1 rounded-full shadow-sm">-${Math.round((1 - p.price/p.originalPrice)*100)}%</span>` : '';
+            const priceDisplay = hasDiscount ? `<div class="flex flex-col items-start"><span class="text-[10px] text-gray-400 line-through">S/${parseFloat(p.originalPrice).toFixed(2)}</span><span class="text-xl font-extrabold text-cyan-700">S/${parseFloat(p.price).toFixed(2)}</span></div>` : `<span class="text-xl font-extrabold text-slate-900">S/${parseFloat(p.price).toFixed(2)}</span>`;
             const btn = soldOut ? `<button disabled class="bg-slate-100 text-slate-400 w-10 h-10 rounded-full flex items-center justify-center cursor-not-allowed"><i data-lucide="x" class="w-5 h-5"></i></button>` : `<button onclick="event.stopPropagation(); window.addToCart('${p.id}')" class="bg-cyan-700 text-white w-10 h-10 rounded-full flex items-center justify-center hover:bg-cyan-800 transition-all shadow-lg hover:scale-110 active:scale-95"><i data-lucide="plus" class="w-5 h-5"></i></button>`;
-            const lbl = soldOut ? `<span class="text-red-500 font-bold text-xs uppercase">Agotado</span>` : `<span class="text-xs text-slate-400 font-medium">Stock: ${stock}</span>`;
+            const lbl = soldOut ? `<span class="text-red-500 font-bold text-[10px] uppercase bg-red-50 px-2 py-0.5 rounded">Agotado</span>` : `<span class="text-[10px] text-slate-400 font-bold bg-slate-50 px-2 py-0.5 rounded">Stock: ${stock}</span>`;
+            
+            // NUEVO: Mostrar la Marca si existe
+            const brandTag = p.brand ? `<p class="text-[10px] font-bold text-cyan-600 uppercase tracking-widest mb-0.5">${p.brand}</p>` : '';
 
             const card = document.createElement('div'); 
             card.className = `product-card bg-white rounded-3xl shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] border border-gray-100 overflow-hidden flex flex-col group h-full cursor-pointer ${soldOut ? 'sold-out' : ''}`;
             card.onclick = () => window.openProductModal(p.id);
-            card.innerHTML = `<div class="h-64 overflow-hidden bg-gray-50 relative p-8 flex items-center justify-center"><img src="${p.imageUrl}" class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500 drop-shadow-xl" onerror="this.src='https://via.placeholder.com/300'"><div class="absolute top-4 left-4 flex gap-1"><span class="bg-white/90 backdrop-blur px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider text-slate-600 border border-white shadow-sm">${p.category}</span></div>${discountBadge}</div><div class="p-6 flex-1 flex flex-col"><div class="flex items-start justify-between mb-2 gap-2"><h3 class="font-bold text-lg text-slate-800 leading-tight line-clamp-2">${p.name}</h3></div><div class="mb-6 flex items-center w-full">${lbl}</div><div class="mt-auto flex justify-between items-center pt-4 border-t border-slate-50">${priceDisplay}${btn}</div></div>`;
+            
+            card.innerHTML = `
+                <div class="h-64 overflow-hidden bg-gray-50 relative p-8 flex items-center justify-center group">
+                    <img src="${p.imageUrl}" class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500 drop-shadow-xl mix-blend-multiply" onerror="this.src='https://via.placeholder.com/300?text=Sin+Foto'">
+                    <div class="absolute top-4 left-4 flex gap-1">
+                        <span class="bg-white/90 backdrop-blur px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider text-slate-600 border border-white shadow-sm">${p.category}</span>
+                    </div>
+                    ${discountBadge}
+                </div>
+                <div class="p-5 flex-1 flex flex-col">
+                    <div class="mb-2">
+                        ${brandTag} <h3 class="font-bold text-lg text-slate-800 leading-tight line-clamp-2">${p.name}</h3>
+                    </div>
+                    <div class="mb-4 flex items-center w-full">${lbl}</div>
+                    <div class="mt-auto flex justify-between items-center pt-3 border-t border-slate-50">
+                        ${priceDisplay}${btn}
+                    </div>
+                </div>`;
             grid.appendChild(card);
         });
         lucide.createIcons();
     }
-
     // --- CARRITO ---
     window.addToCart = (id) => { 
         const p = allProducts.find(x => x.id === id); 
@@ -842,6 +878,38 @@ window.open(`https://wa.me/51974559091?text=${encodeURIComponent(waText)}`, '_bl
         steps.forEach((st, i) => { const dot = document.getElementById(`step-${st}`); if(i <= idx) { dot.className = "timeline-step active"; dot.innerHTML = '<i data-lucide="check" class="w-4 h-4"></i>'; } else { dot.className = "timeline-step"; dot.innerHTML = i+1; } }); lucide.createIcons();
     }
 
+// FUNCIÓN NUEVA: DIBUJAR CATEGORÍAS AUTOMÁTICAMENTE
+    function renderCategoryButtons() {
+        const container = document.getElementById('category-filters');
+        
+        // 1. Buscar todas las categorías únicas que tienes en tus productos
+        // El 'Set' elimina duplicados automáticamente
+        const uniqueCategories = ['all', ...new Set(allProducts.map(p => p.category))];
+        
+        // 2. Crear los botones HTML
+        container.innerHTML = uniqueCategories.map(cat => {
+            const label = cat === 'all' ? 'Todo' : cat;
+            
+            // Estilos: ¿Es el botón activo o inactivo?
+            const isActive = currentFilter === cat;
+            const activeStyle = "bg-slate-900 text-white border-slate-900 shadow-lg";
+            const inactiveStyle = "bg-white text-slate-600 border-slate-200 hover:border-cyan-500 hover:text-cyan-700";
+            
+            return `<button onclick="applyFilter('${cat}')" 
+                    class="px-6 py-2.5 rounded-full text-sm font-semibold border transition-all ${isActive ? activeStyle : inactiveStyle}">
+                    ${label}
+                </button>`;
+        }).join('');
+    }
+
+    // FUNCIÓN AUXILIAR PARA AL HACER CLIC
+    window.applyFilter = (category) => {
+        currentFilter = category;
+        renderCategoryButtons(); // Volver a dibujar para actualizar colores (negro/blanco)
+        renderStore(); // Filtrar los productos
+    };
+
+
     // Funciones de UI Modales
     window.toggleCart = () => { const m = document.getElementById('cart-modal'); const p = document.getElementById('cart-panel'); if(m.classList.contains('hidden')) { m.classList.remove('hidden'); setTimeout(() => p.classList.remove('translate-x-full'), 10); } else { p.classList.add('translate-x-full'); setTimeout(() => m.classList.add('hidden'), 300); } };
     window.togglePaymentModal = () => document.getElementById('payment-modal').classList.toggle('hidden');
@@ -863,6 +931,7 @@ window.toggleMobileMenu = () => {
 </body>
 
 </html>
+
 
 
 
